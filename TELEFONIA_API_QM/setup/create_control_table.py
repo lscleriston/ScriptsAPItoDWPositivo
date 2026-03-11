@@ -23,7 +23,7 @@ def main():
             client_name text,
             table_name text,
             operacao text,
-            last_date date,
+            last_data timestamp,
             metadata jsonb,
             updated_at timestamptz default now(),
             PRIMARY KEY (client_name, table_name, operacao)

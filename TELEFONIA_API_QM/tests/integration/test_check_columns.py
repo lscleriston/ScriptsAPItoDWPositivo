@@ -41,8 +41,8 @@ def main():
     else:
         print("Tabela tb_controler_consulta_api NAO EXISTE no banco.")
 
-    print(f"\nTentando ADD COLUMN last_date no schema '{schema}'...")
-    cur.execute(f"ALTER TABLE {schema}.tb_controler_consulta_api ADD COLUMN IF NOT EXISTS last_date date")
+    print(f"\nTentando ADD COLUMN last_data no schema '{schema}'...")
+    cur.execute(f"ALTER TABLE {schema}.tb_controler_consulta_api ADD COLUMN IF NOT EXISTS last_data timestamp")
 
     cur.execute(
         """

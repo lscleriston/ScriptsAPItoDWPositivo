@@ -7,7 +7,7 @@ from calendar import monthrange
 from typing import Dict, Any
 
 from ..telefonia_client import TelefoniaClient
-from ..postgres_utils import get_pg_conn, get_last_date, update_last_date
+from ..postgres_utils import get_pg_conn, get_last_data, update_last_data
 from ..db_table_utils import ensure_table_and_columns, insert_records
 
 
@@ -111,7 +111,7 @@ def process(client_config: Dict[str, Any], client_name: str):
     operacao = client_name.upper()
 
     # Verificar última data coletada
-    ultima_data = get_last_date(cursor, client_name, nome_tabela, operacao)
+    ultima_data = get_last_data(cursor, client_name, nome_tabela, operacao)
     hoje = datetime.today().date()
     data_fim = hoje - timedelta(days=1)
 
@@ -195,8 +195,8 @@ def process(client_config: Dict[str, Any], client_name: str):
 
             # Atualizar controle apenas após gravação real no banco
             if inseridos > 0:
-                update_last_date(cursor, None, client_name, nome_tabela, operacao, fim_real)
-                print(f"[INFO] last_date atualizado para {fim_real}")
+                update_last_data(cursor, None, client_name, nome_tabela, operacao, fim_real)
+                print(f"[INFO] last_data atualizado para {fim_real}")
 
     print(f"[INFO] Total inseridos em {nome_tabela}: {total_inseridos} registros")
     conn.close()

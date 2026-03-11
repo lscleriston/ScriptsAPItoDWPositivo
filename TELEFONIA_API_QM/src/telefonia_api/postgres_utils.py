@@ -48,7 +48,7 @@ def _ensure_control_table(cursor, control_table: str):
         pass
 
 
-def get_last_date(cursor, client_name: str, nome_tabela: str, operacao: str, nome_tabela_ultimo_id: Optional[str] = None) -> Optional[date]:
+def get_last_data(cursor, client_name: str, nome_tabela: str, operacao: str, nome_tabela_ultimo_id: Optional[str] = None) -> Optional[date]:
     """Return last processed date for a client/table/operacao.
 
     Priority:
@@ -90,7 +90,7 @@ def get_last_date(cursor, client_name: str, nome_tabela: str, operacao: str, nom
     return None
 
 
-def update_last_date(cursor, nome_tabela_ultimo_id: Optional[str], client_name: str, nome_tabela: str, operacao: str, ultima_data: date):
+def update_last_data(cursor, nome_tabela_ultimo_id: Optional[str], client_name: str, nome_tabela: str, operacao: str, ultima_data: date):
     """Upsert last_data in control table. Keys are always lowercase client_name / UPPERCASE operacao."""
     client_key = (client_name or '').strip().lower()
     operacao_key = (operacao or '').strip().upper()
