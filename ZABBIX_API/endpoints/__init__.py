@@ -1,0 +1,1 @@
+# Módulos de processamento por endpoint Zabbix
