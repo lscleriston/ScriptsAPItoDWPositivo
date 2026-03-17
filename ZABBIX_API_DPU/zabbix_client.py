@@ -247,6 +247,34 @@ class ZabbixClient:
 		}
 		return self._call('event.get', params)
 
+	def get_slas(
+		self,
+		slaids: Optional[List[str]] = None,
+		serviceids: Optional[List[str]] = None,
+		include_schedule: bool = False,
+		include_excluded_downtimes: bool = False,
+		include_service_tags: bool = True,
+		extra_params: Optional[Dict[str, Any]] = None,
+		**filters: Any
+	) -> List[Dict[str, Any]]:
+		"""Recupera SLAs e, opcionalmente, tags associadas via `sla.get`."""
+		params: Dict[str, Any] = {"output": "extend"}
+		if slaids:
+			params['slaids'] = slaids
+		if serviceids:
+			params['serviceids'] = serviceids
+		if include_schedule:
+			params['selectSchedule'] = "extend"
+		if include_excluded_downtimes:
+			params['selectExcludedDowntimes'] = "extend"
+		if include_service_tags:
+			params['selectServiceTags'] = "extend"
+		if extra_params:
+			params.update(extra_params)
+		if filters:
+			params.update(filters)
+		return self._call('sla.get', params)
+
 	def get_users(self, userids: List[str]) -> List[Dict[str, Any]]:
 		"""Recupera informações de usuários por `userids`."""
 		if not userids:

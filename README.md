@@ -28,6 +28,7 @@ Zabbix_Api/
 ├── endpoints/                # 📁 Módulos de processamento por endpoint
 │   ├── host.py               # 🖥️ Hosts (dados dos servidores monitorados)
 │   ├── event.py              # 📝 Events (eventos e alertas)
+│   ├── sla.py                # 🏷️ SLAs e tags associadas
 │   └── __init__.py
 ├── .env                      # 🔐 Configurações de ambiente (credenciais)
 ├── requirements.txt          # 📦 Dependências Python
@@ -115,6 +116,7 @@ Adicione ao crontab para execução automática:
 - **`tb_controler_consulta_api`**: Controle incremental por cliente/endpoint
 - **`tb_zabbix_host`**: Hosts monitorados
 - **`tb_zabbix_event`**: Eventos e alertas
+- **`tb_zabbix_sla`**: SLAs configuradas e suas tags (service tags)
 
 ### Dados Coletados
 
@@ -140,6 +142,15 @@ Adicione ao crontab para execução automática:
 - `severity`: Severidade
 - `operacao`: Cliente/organização
 
+#### SLA (`tb_zabbix_sla`)
+- `slaid`: ID do SLA
+- `sla_name`: Nome configurado no Zabbix
+- `tag`: Nome da tag de serviço
+- `tag_value`: Valor associado
+- `tag_operator` / `tag_operator_label`: Operador (0 = equals, 2 = contains)
+- `slo`, `period`, `effective_date`, `timezone`, `status`, `description`: Metadados do SLA
+- `operacao`: Cliente/organização
+
 ## 🔧 Desenvolvimento
 
 ### Adicionando Novo Endpoint
@@ -147,6 +158,9 @@ Adicione ao crontab para execução automática:
 1. **Criar módulo**: `endpoints/<recurso>.py`
 2. **Implementar função**: `process(client, client_name, nome_tabela, operacao, nome_tabela_ultimo_id)`
 3. **Adicionar endpoint**: Na variável `ZABBIX_ENDPOINTS_<SUFIXO>` no `.env`
+
+> Novo: para coletar SLAs e suas tags, adicione `sla` no endpoint do cliente (ex.: `ZABBIX_ENDPOINTS_DPU=host,event,sla`).
+> O handler `endpoints/sla.py` invoca `sla.get` com `selectServiceTags=extend`, expande cada tag em registros individuais e persiste em `tb_zabbix_sla`, substituindo o snapshot da operação a cada execução.
 
 Exemplo de estrutura do módulo:
 
