@@ -1,4 +1,5 @@
 from typing import Tuple, List
+import json
 from postgres_utils import get_pg_conn
 from db_table_utils import ensure_table_and_columns, insert_records
 
@@ -29,6 +30,9 @@ def _process_triggers(client, client_name, nome_tabela, operacao, nome_tabela_ul
                 lastchange = int(t.get('lastchange'))
         except Exception:
             lastchange = None
+        # Serializa tags como JSON string para armazenar no banco
+        tags_raw = t.get('tags')
+        tags = json.dumps(tags_raw, ensure_ascii=False) if tags_raw else None
         records.append({
             'triggerid': t.get('triggerid'),
             'description': t.get('description'),
@@ -37,6 +41,7 @@ def _process_triggers(client, client_name, nome_tabela, operacao, nome_tabela_ul
             'hostid': hostid,
             'hostname': hostname,
             'lastchange': lastchange,
+            'tags': tags,
         })
 
     conn = None
@@ -53,8 +58,21 @@ def _process_triggers(client, client_name, nome_tabela, operacao, nome_tabela_ul
         # Ensure table exists and columns inferred
         ensure_table_and_columns(conn, triggers_table, records, operacao)
 
+        # Remove previous rows for this operation to ensure we store latest data
+        try:
+            cur = conn.cursor()
+            delete_query = f"DELETE FROM {triggers_table} WHERE operacao = %s"
+            cur.execute(delete_query, (operacao,))
+            cur.close()
+        except Exception as e:
+            print(f"[WARN] Falha ao limpar triggers antigas para operacao {operacao}: {e}")
+
         # Insert records
         inseridos, ids = insert_records(conn, triggers_table, records, operacao)
+        try:
+            conn.commit()
+        except Exception:
+            pass
         return inseridos, ids
     except Exception as e:
         print(f"[ERROR] Falha ao salvar triggers: {e}")
